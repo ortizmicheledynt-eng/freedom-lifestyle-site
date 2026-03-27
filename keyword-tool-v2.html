@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keyword Planner — Freedom Lifestyle</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf8f4;--bg2:#f0ebe0;--bg3:#e8e2d6;
+  --text:#1a1714;--text2:#6b6259;--text3:#a89f94;
+  --red:#e60023;--red2:#b8001b;
+  --border:rgba(26,23,20,.09);--border2:rgba(26,23,20,.16);
+  --green-bg:#eaf3de;--green-fg:#3b6d11;
+  --amber-bg:#faeeda;--amber-fg:#854f0b;
+  --gray-bg:#f1efe8;--gray-fg:#5f5e5a;
+  --r:8px;--rl:14px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* LOCK */
+#lockScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.lock-card{background:#fff;border:0.5px solid var(--border2);border-radius:var(--rl);padding:40px 36px;width:100%;max-width:340px;text-align:center}
+.lock-logo{width:36px;height:36px;background:var(--red);border-radius:50%;margin:0 auto 20px}
+.lock-title{font-size:18px;font-weight:500;margin-bottom:6px}
+.lock-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
+.lock-input-wrap{position:relative;margin-bottom:14px}
+.lock-input-wrap input{width:100%;padding:10px 40px 10px 14px;border:0.5px solid var(--border2);border-radius:var(--r);font-size:15px;background:var(--bg);color:var(--text);outline:none;text-align:center;letter-spacing:4px;font-family:monospace}
+.lock-input-wrap input:focus{border-color:var(--text3)}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text3);background:none;border:none;font-size:16px;padding:0}
+.lock-btn{width:100%;padding:10px;background:var(--red);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+.lock-btn:hover{background:var(--red2)}
+.lock-err{font-size:12px;color:var(--red);margin-top:10px;min-height:18px}
+
+/* APP */
+#app{display:none;min-height:100vh;padding:24px 20px}
+.app-inner{max-width:900px;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-dot{width:18px;height:18px;background:var(--red);border-radius:50%}
+.brand-name{font-size:14px;font-weight:500}
+.lock-out{font-size:11px;color:var(--text3);background:none;border:0.5px solid var(--border2);border-radius:var(--r);padding:4px 10px;cursor:pointer;font-family:inherit}
+.lock-out:hover{color:var(--text)}
+.tab-bar{display:flex;border:0.5px solid var(--border2);border-radius:var(--r);overflow:hidden;width:fit-content;margin-bottom:16px}
+.tab{padding:6px 16px;font-size:12px;cursor:pointer;background:#fff;color:var(--text2);border:none;font-family:inherit}
+.tab.active{background:var(--text);color:#fff}
+.panel{display:none}.panel.show{display:block}
+
+/* SETTINGS */
+.card{background:#fff;border:0.5px solid var(--border);border-radius:var(--rl);padding:16px 20px;margin-bottom:14px}
+.sec-label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:11px;color:var(--text2)}
+input[type=text],input[type=password],input[type=number]{width:100%;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;outline:none;font-family:inherit}
+input:focus{border-color:var(--text3);background:#fff}
+.mono{font-family:'SF Mono','Fira Code',monospace;font-size:11px}
+.hint{font-size:11px;color:var(--text3);line-height:1.6;margin-top:4px}
+.hint a{color:#185fa5;text-decoration:none}
+.hint code{background:var(--bg2);padding:1px 4px;border-radius:3px;font-size:10px}
+.row-btns{display:flex;align-items:center;gap:8px}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:inherit;border:0.5px solid var(--border2)}
+.btn-primary{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-primary:hover{opacity:.8}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text)}
+.btn-ghost:hover{background:var(--bg2)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.saved-ok{font-size:11px;color:var(--green-fg);display:none}
+
+/* SEARCH */
+.proxy-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;font-size:11px;color:var(--text3)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.dot.ok{background:#639922}.dot.trying{background:#ba7517}.dot.err{background:#e24b4a}
+.search-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap}
+.search-row .field{flex:1;min-width:160px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--bg2);border-radius:var(--r);padding:10px 14px}
+.stat-l{font-size:10px;color:var(--text2);margin-bottom:3px}
+.stat-v{font-size:20px;font-weight:500}
+.filter-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.filter-row label{font-size:11px;color:var(--text2)}
+select{padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);background:#fff;color:var(--text);font-size:11px;outline:none;font-family:inherit}
+input[type=search]{padding:5px 10px;border:0.5px solid var(--border2);border-radius:var(--r);background:#fff;color:var(--text);font-size:11px;outline:none;font-family:inherit;width:180px}
+.count{font-size:11px;color:var(--text3);margin-left:auto}
+.tbl-wrap{background:#fff;border:0.5px solid var(--border);border-radius:var(--rl);overflow:hidden}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{padding:8px 12px;text-align:left;font-size:10px;font-weight:500;color:var(--text2);background:var(--bg2);border-bottom:0.5px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:0.5px solid var(--border)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg2)}
+td{padding:8px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.c-rank{width:32px;color:var(--text3);font-size:11px}
+.c-vol{width:200px}
+.c-tier{width:64px}
+.bar-wrap{display:flex;align-items:center;gap:6px}
+.bar-bg{flex:1;height:5px;border-radius:3px;background:var(--bg3);overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:var(--text)}
+.vol-txt{font-size:11px;color:var(--text2);min-width:52px;text-align:right}
+.badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500}
+.bh{background:var(--green-bg);color:var(--green-fg)}
+.bm{background:var(--amber-bg);color:var(--amber-fg)}
+.bl{background:var(--gray-bg);color:var(--gray-fg)}
+.alert{padding:8px 12px;border-radius:var(--r);font-size:11px;line-height:1.6;margin-bottom:12px}
+.aerr{background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595}
+.ainfo{background:#e6f1fb;color:#0c447c;border:0.5px solid #b5d4f4}
+.loader{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:12px;padding:12px 0}
+.spin{width:14px;height:14px;border:1.5px solid var(--border2);border-top-color:var(--text);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.result-title{font-size:12px;font-weight:500;color:var(--text2)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-logo"></div>
+    <div class="lock-title">Freedom Lifestyle</div>
+    <div class="lock-sub">Keyword Planner — nhập password để tiếp tục</div>
+    <div class="lock-input-wrap">
+      <input type="password" id="pwInput" placeholder="••••" maxlength="32" />
+      <button class="eye-btn" id="eyeBtn">👁</button>
+    </div>
+    <button class="lock-btn" id="unlockBtn">Đăng nhập</button>
+    <div class="lock-err" id="lockErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="app-inner">
+    <div class="topbar">
+      <div class="brand"><div class="brand-dot"></div><span class="brand-name">Keyword Planner</span></div>
+      <button class="lock-out" id="lockOutBtn">Khoá</button>
+    </div>
+    <div class="tab-bar">
+      <button class="tab" id="tab-search">Tìm kiếm</button>
+      <button class="tab" id="tab-settings">Cài đặt</button>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="panel" id="panel-search">
+      <div class="proxy-bar"><div class="dot" id="proxyDot"></div><span id="proxyLabel">Sẵn sàng</span></div>
+      <div class="search-row">
+        <div class="field"><label>Seed keyword</label><input type="text" id="seed" placeholder="vd: travel outfit, home decor, nail art..." /></div>
+        <div class="field" style="max-width:80px"><label>Top N</label><input type="number" id="topN" value="25" min="5" max="100" /></div>
+        <button class="btn btn-primary" id="runBtn">Tìm</button>
+      </div>
+      <div id="alertBox" class="hidden"></div>
+      <div id="loaderBox" class="loader hidden"><div class="spin"></div><span id="loaderMsg">Đang gọi Pinterest API...</span></div>
+      <div class="stats hidden" id="statsRow">
+        <div class="stat"><div class="stat-l">Keywords</div><div class="stat-v" id="sTotal">0</div></div>
+        <div class="stat"><div class="stat-l">Volume cao nhất</div><div class="stat-v" id="sTop">-</div></div>
+        <div class="stat"><div class="stat-l">Nhóm cao (5m+)</div><div class="stat-v" id="sHigh">0</div></div>
+        <div class="stat"><div class="stat-l">Nhóm trung bình</div><div class="stat-v" id="sMid">0</div></div>
+      </div>
+      <div id="resultSection" class="hidden">
+        <div class="result-topbar">
+          <span class="result-title" id="resultTitle"></span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" id="csvBtn">Copy CSV</button>
+            <button class="btn btn-ghost btn-sm" id="dlBtn">Tải CSV</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <label>Lọc:</label>
+          <select id="fTier"><option value="all">Tất cả</option><option value="high">Cao (5m+)</option><option value="mid">Trung bình</option><option value="low">Thấp</option></select>
+          <input type="search" id="fKw" placeholder="Tìm keyword..." />
+          <span class="count" id="countLbl"></span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th class="c-rank">#</th><th>Keyword</th><th class="c-vol">Monthly searches</th><th class="c-tier">Nhóm</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="sec-label">Cloudflare Worker URL</div>
+        <div class="field">
+          <label>Worker URL</label>
+          <input type="text" id="workerUrl" class="mono" placeholder="https://pinterest-proxy.YOUR-NAME.workers.dev" />
+          <div class="hint">URL của Cloudflare Worker bạn đã deploy. Xem hướng dẫn bên dưới.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-label">Pinterest API</div>
+        <div class="field">
+          <label>Access Token</label>
+          <input type="password" id="token" class="mono" placeholder="pina_XXXXXXXXXXXXXXXXXXXXXXXX" />
+          <div class="hint">Lấy tại <a href="https://developers.pinterest.com/apps/" target="_blank">developers.pinterest.com</a> → app → Generate token → chọn <code>Production Limited</code></div>
+        </div>
+        <div class="field">
+          <label>Ad Account ID</label>
+          <input type="text" id="accountId" class="mono" placeholder="549759637018" />
+          <div class="hint">Xem trên URL Pinterest Ads: ads.pinterest.com/advertiser/<strong>ID_ĐÂY</strong>/</div>
+        </div>
+        <div class="row-btns">
+          <button class="btn btn-primary" id="saveBtn">Lưu cài đặt</button>
+          <span class="saved-ok" id="savedOk">Đã lưu!</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-label">Hướng dẫn deploy Cloudflare Worker</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8">
+          <b style="color:var(--text)">1.</b> Vào <a href="https://workers.cloudflare.com" target="_blank" style="color:#185fa5">workers.cloudflare.com</a> → đăng ký miễn phí<br>
+          <b style="color:var(--text)">2.</b> Nhấn <b style="color:var(--text)">Create Worker</b> → đặt tên (vd: <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">pinterest-proxy</code>)<br>
+          <b style="color:var(--text)">3.</b> Xoá hết code mặc định → paste toàn bộ code từ file <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">pinterest-worker.js</code> vào<br>
+          <b style="color:var(--text)">4.</b> Nhấn <b style="color:var(--text)">Deploy</b> → copy URL worker (dạng <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">https://pinterest-proxy.xxx.workers.dev</code>)<br>
+          <b style="color:var(--text)">5.</b> Paste URL đó vào ô <b style="color:var(--text)">Worker URL</b> bên trên → Lưu
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PW_HASH='2926a2731f4b312c08982cacf8061eb14bf65c1a87cc5d70e864e079c6220731';
+const BUCKETS=[
+  {l:'5m+',min:5e6,tier:'high'},{l:'2m-3m',min:2e6,tier:'mid'},
+  {l:'1m-2m',min:1e6,tier:'mid'},{l:'500k-1m',min:5e5,tier:'mid'},
+  {l:'250k-500k',min:25e4,tier:'low'},{l:'100k-500k',min:1e5,tier:'low'},
+  {l:'50k-100k',min:5e4,tier:'low'},{l:'10k-50k',min:1e4,tier:'low'},
+  {l:'1k-10k',min:1e3,tier:'low'},{l:'<1k',min:0,tier:'low'},
+];
+function parseBucket(raw){
+  if(raw==null)return{l:'n/a',min:0,tier:'low'};
+  if(typeof raw==='number'){const t=raw>=5e6?'high':raw>=1e6?'mid':'low';const l=raw>=1e6?(raw/1e6).toFixed(1).replace(/\.0$/,'')+'M':(raw/1e3).toFixed(0)+'K';return{l,min:raw,tier:t};}
+  const s=String(raw).toLowerCase().replace(/\s/g,'');
+  for(const b of BUCKETS)if(s===b.l.toLowerCase().replace(/\s/g,''))return b;
+  const mp=s.match(/^(\d+(?:\.\d+)?)m\+?$/);if(mp){const v=parseFloat(mp[1])*1e6;return{l:raw,min:v,tier:v>=5e6?'high':v>=1e6?'mid':'low'};}
+  const mr=s.match(/^(\d+(?:\.\d+)?)(m|k)-(\d+(?:\.\d+)?)(m|k)$/);if(mr){const mu=x=>x==='m'?1e6:1e3;const mn=parseFloat(mr[1])*mu(mr[2]);return{l:raw,min:mn,tier:mn>=5e6?'high':mn>=1e6?'mid':'low'};}
+  const kp=s.match(/^(\d+(?:\.\d+)?)k\+?$/);if(kp){const v=parseFloat(kp[1])*1e3;return{l:raw,min:v,tier:v>=1e6?'mid':'low'};}
+  return{l:raw,min:0,tier:'low'};
+}
+
+let allData=[];
+let cfg={token:'',accountId:'',workerUrl:''};
+
+async function hashStr(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+
+async function unlock(){
+  const pw=document.getElementById('pwInput').value;
+  if(!pw)return;
+  const h=await hashStr(pw);
+  if(h===PW_HASH){
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('lockErr').textContent='';
+    loadSettings();showTab('search');
+  } else {
+    document.getElementById('lockErr').textContent='Password không đúng. Thử lại.';
+    document.getElementById('pwInput').value='';
+  }
+}
+function lockOut(){document.getElementById('app').style.display='none';document.getElementById('lockScreen').style.display='flex';document.getElementById('pwInput').value='';}
+
+function showTab(name){
+  ['search','settings'].forEach(t=>{
+    document.getElementById('panel-'+t).classList.toggle('show',t===name);
+    document.getElementById('tab-'+t).classList.toggle('active',t===name);
+  });
+}
+
+function loadSettings(){
+  const s=JSON.parse(sessionStorage.getItem('kp_cfg')||'{}');
+  if(s.token){document.getElementById('token').value=s.token;cfg.token=s.token;}
+  if(s.accountId){document.getElementById('accountId').value=s.accountId;cfg.accountId=s.accountId;}
+  if(s.workerUrl){document.getElementById('workerUrl').value=s.workerUrl;cfg.workerUrl=s.workerUrl;}
+}
+function saveSettings(){
+  cfg.token=document.getElementById('token').value.trim();
+  cfg.accountId=document.getElementById('accountId').value.trim();
+  cfg.workerUrl=document.getElementById('workerUrl').value.trim().replace(/\/$/,'');
+  sessionStorage.setItem('kp_cfg',JSON.stringify(cfg));
+  const ok=document.getElementById('savedOk');ok.style.display='inline';setTimeout(()=>ok.style.display='none',2000);
+}
+
+function showAlert(msg,type='err'){const b=document.getElementById('alertBox');b.className='alert '+(type==='err'?'aerr':'ainfo');b.innerHTML=msg;b.classList.remove('hidden');}
+function hideAlert(){document.getElementById('alertBox').classList.add('hidden');}
+function showLoader(){document.getElementById('loaderBox').classList.remove('hidden');}
+function hideLoader(){document.getElementById('loaderBox').classList.add('hidden');}
+function setProxy(state,msg){document.getElementById('proxyDot').className='dot '+state;document.getElementById('proxyLabel').textContent=msg;}
+
+async function run(){
+  const token=cfg.token||document.getElementById('token').value.trim();
+  const accountId=cfg.accountId||document.getElementById('accountId').value.trim();
+  const workerUrl=cfg.workerUrl||document.getElementById('workerUrl').value.trim().replace(/\/$/,'');
+  const seed=document.getElementById('seed').value.trim();
+  const topN=parseInt(document.getElementById('topN').value)||25;
+
+  if(!workerUrl){showAlert('Vui lòng vào <b>Cài đặt</b> nhập Worker URL trước.');return;}
+  if(!token||!accountId){showAlert('Vui lòng vào <b>Cài đặt</b> nhập Access Token và Ad Account ID.');return;}
+  if(!seed){showAlert('Vui lòng nhập seed keyword.');return;}
+
+  hideAlert();
+  document.getElementById('runBtn').disabled=true;
+  document.getElementById('statsRow').classList.add('hidden');
+  document.getElementById('resultSection').classList.add('hidden');
+  setProxy('trying','Đang gọi API...');showLoader();
+
+  try {
+    const url=`${workerUrl}?keyword=${encodeURIComponent(seed)}&count=100`;
+    const resp=await fetch(url,{headers:{'X-Pinterest-Token':token,'X-Account-Id':accountId}});
+    if(resp.status===401){showAlert('Token không hợp lệ hoặc hết hạn.');setProxy('err','Token lỗi');return;}
+    if(resp.status===403){showAlert('Không có quyền. Kiểm tra lại token và Ad Account ID.');setProxy('err','Không có quyền');return;}
+    if(!resp.ok){const t=await resp.text();showAlert(`Lỗi ${resp.status}: ${t.slice(0,150)}`);setProxy('err','Lỗi API');return;}
+
+    const json=await resp.json();
+    const items=json.suggestions||json.keywords||json.data||[];
+    if(!items.length){showAlert('API trả về 0 keywords. Thử seed keyword khác.','info');setProxy('err','Không có kết quả');return;}
+
+    allData=items
+      .map(item=>({kw:(item.keyword||item.name||item.value||item.term||'').trim(),bucket:parseBucket(item.monthly_searches??item.search_volume??item.volume??item.monthly_volume??null)}))
+      .filter(d=>d.kw).sort((a,b)=>b.bucket.min-a.bucket.min).slice(0,topN);
+
+    setProxy('ok',`Tìm thấy ${items.length} keywords`);
+    document.getElementById('sTotal').textContent=allData.length;
+    document.getElementById('sTop').textContent=allData[0]?.bucket.l||'-';
+    document.getElementById('sHigh').textContent=allData.filter(d=>d.bucket.tier==='high').length;
+    document.getElementById('sMid').textContent=allData.filter(d=>d.bucket.tier==='mid').length;
+    document.getElementById('resultTitle').textContent=`Top ${allData.length} keywords cho "${seed}"`;
+    document.getElementById('statsRow').classList.remove('hidden');
+    document.getElementById('resultSection').classList.remove('hidden');
+    document.getElementById('fTier').value='all';document.getElementById('fKw').value='';render();
+
+  } catch(e){
+    setProxy('err','Lỗi kết nối');
+    showAlert('Không kết nối được Worker. Kiểm tra lại Worker URL trong Cài đặt.<br><small>'+e.message+'</small>');
+  } finally {
+    document.getElementById('runBtn').disabled=false;hideLoader();
+  }
+}
+
+function render(){
+  const tier=document.getElementById('fTier').value;
+  const q=document.getElementById('fKw').value.toLowerCase();
+  const data=allData.filter(d=>{if(tier!=='all'&&d.bucket.tier!==tier)return false;if(q&&!d.kw.toLowerCase().includes(q))return false;return true;});
+  const maxMin=Math.max(...data.map(d=>d.bucket.min),1);
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const badge=t=>t==='high'?'<span class="badge bh">Cao</span>':t==='mid'?'<span class="badge bm">TB</span>':'<span class="badge bl">Thấp</span>';
+  document.getElementById('countLbl').textContent=data.length+' keywords';
+  document.getElementById('tbody').innerHTML=data.length
+    ?data.map((d,i)=>`<tr><td class="c-rank">${i+1}</td><td>${esc(d.kw)}</td><td class="c-vol"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(d.bucket.min/maxMin*100)}%"></div></div><span class="vol-txt">${esc(d.bucket.l)}</span></div></td><td class="c-tier">${badge(d.bucket.tier)}</td></tr>`).join('')
+    :'<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Không có kết quả</td></tr>';
+}
+
+function makeCSV(){return[['rank','keyword','monthly_searches','tier'],...allData.map((d,i)=>[i+1,d.kw,d.bucket.l,d.bucket.tier])].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('unlockBtn').addEventListener('click',unlock);
+  document.getElementById('eyeBtn').addEventListener('click',()=>{const i=document.getElementById('pwInput');i.type=i.type==='password'?'text':'password';});
+  document.getElementById('lockOutBtn').addEventListener('click',lockOut);
+  document.getElementById('tab-search').addEventListener('click',()=>showTab('search'));
+  document.getElementById('tab-settings').addEventListener('click',()=>showTab('settings'));
+  document.getElementById('runBtn').addEventListener('click',run);
+  document.getElementById('saveBtn').addEventListener('click',saveSettings);
+  document.getElementById('csvBtn').addEventListener('click',()=>navigator.clipboard.writeText(makeCSV()).then(()=>alert('Đã copy!')));
+  document.getElementById('dlBtn').addEventListener('click',()=>{const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(makeCSV());a.download='pinterest-keywords.csv';a.click();});
+  document.getElementById('fTier').addEventListener('change',render);
+  document.getElementById('fKw').addEventListener('input',render);
+  document.getElementById('seed').addEventListener('keydown',e=>{if(e.key==='Enter')run();});
+  document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+});
+</script>
+</body>
+</html>
